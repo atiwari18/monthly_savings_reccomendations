@@ -2,6 +2,9 @@ import React from 'react';
 
 export const Landing = () => {
     const [monthlyExpenses, setMonthlyExpenses] = React.useState([{ id: 1, label: '', value: '' }]);
+    const [yearlyIncome, setYearlyIncome] = React.useState(0);
+    const [reportData, setReportData] = React.useState(null);
+
 
     const handleAddExpense = () => {
         const newExpense = {
@@ -24,6 +27,28 @@ export const Landing = () => {
         setMonthlyExpenses(updatedExpenses);
     };
 
+    const handleGenerateReport = () => {
+        const totalExpenses = monthlyExpenses.reduce((acc, expense) => acc + parseFloat(expense.value || 0), 0);
+        const percentageSpent = (totalExpenses / yearlyIncome) * 100;
+
+        const expenseBreakdown = monthlyExpenses.map((expense) => ({
+            label: expense.label, 
+            value: (parseFloat(expense.value) / yearlyIncome) * 100,
+        }));
+
+        const report = {
+            totalExpenses, 
+            percentageSpent, 
+            expenseBreakdown, 
+        };
+
+        setReportData(report);
+    }
+
+    const handleYearlyIncomeChange = (value) => {
+        setYearlyIncome(value);
+    }
+
     return (
         <body className="container-fluid h-100 mt-4">
         <div className="row h-100 justify-content-center align-items-center">
@@ -39,6 +64,8 @@ export const Landing = () => {
                     id="inputEmail3"
                     placeholder="Yearly Income"
                     min="0"
+                    value={yearlyIncome}
+                    onChange ={(e) => handleYearlyIncomeChange(e.target.value)}
                 />
                 </div>
             </div>
@@ -73,7 +100,7 @@ export const Landing = () => {
                         placeholder={`Enter monthly expense #${expense.id}`}
                         min="0"
                         value={expense.value}
-                        onChange={e => handleExpenseChange(expense.id, e.target.value)}
+                        onChange={e => handleExpenseChange(expense.id, 'value', e.target.value)}
                     />
                     <button
                         type="button"
@@ -91,12 +118,21 @@ export const Landing = () => {
             </div>
             <div className="form-group row mb-3">
                 <div className="col-sm-10">
-                <button type="submit" className="btn btn-primary">
+                <button type="submit" className="btn btn-primary" onClick={handleGenerateReport}>
                     Generate Report
                 </button>
                 </div>
             </div>
             </form>
+            {reportData && (
+    <div className="mx-auto mt-4 text-center">
+        <div style={{ textAlign: 'left', display: 'inline-block' }}>
+            <h2>Report</h2>
+            <p>Total Monthly Expenses: ${reportData.totalExpenses.toFixed(2)}</p>
+            <p>Percentage of Yearly Income Spent: {reportData.percentageSpent.toFixed(2)}%</p>
+        </div>
+    </div>
+)}
         </div>
         </body>
     );
