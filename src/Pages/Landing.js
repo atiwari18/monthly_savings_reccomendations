@@ -27,9 +27,10 @@ export const Landing = () => {
         setMonthlyExpenses(updatedExpenses);
     };
 
-    const handleGenerateReport = () => {
+    const handleGenerateReport = (e) => {
+        e.preventDefault();
         const totalExpenses = monthlyExpenses.reduce((acc, expense) => acc + parseFloat(expense.value || 0), 0);
-        const percentageSpent = (totalExpenses / yearlyIncome) * 100;
+        const percentageSpent = (totalExpenses / (yearlyIncome/12)) * 100;
 
         const expenseBreakdown = monthlyExpenses.map((expense) => ({
             label: expense.label, 
@@ -118,21 +119,30 @@ export const Landing = () => {
             </div>
             <div className="form-group row mb-3">
                 <div className="col-sm-10">
-                <button type="submit" className="btn btn-primary" onClick={handleGenerateReport}>
+                <button type="submit" className="btn btn-primary" onClick={(e) => handleGenerateReport(e)}>
                     Generate Report
                 </button>
                 </div>
             </div>
             </form>
             {reportData && (
-    <div className="mx-auto mt-4 text-center">
-        <div style={{ textAlign: 'left', display: 'inline-block' }}>
-            <h2>Report</h2>
-            <p>Total Monthly Expenses: ${reportData.totalExpenses.toFixed(2)}</p>
-            <p>Percentage of Yearly Income Spent: {reportData.percentageSpent.toFixed(2)}%</p>
-        </div>
-    </div>
-)}
+                <div className="mx-auto mt-4 text-center">
+                    <div style={{ textAlign: 'left', display: 'inline-block', border: '1px solid #ddd', padding: '15px', height: '80%', width: '80%', overflowY: 'auto' }}>
+                        <h2>Report</h2>
+                        <p>Total Monthly Expenses: ${reportData.totalExpenses.toFixed(2)}</p>
+                        <p>Percentage of Monthly Income Spent: {reportData.percentageSpent.toFixed(2)}%</p>
+
+                        <h3>Expense Breakdown:</h3>
+                        <ul>
+                            {reportData.expenseBreakdown.map((expense, index) => (
+                                <li key={index}>
+                                    {expense.label}: {expense.value.toFixed(2)}%
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            )}
         </div>
         </body>
     );
